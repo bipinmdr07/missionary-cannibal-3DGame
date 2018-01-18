@@ -10,6 +10,6 @@ public class MenuScript : MonoBehaviour {
 	}
 
 	public void QuitButtonClicked(){
-		Debug.Log ("Quit");
+		Application.Quit ();
 	}
 }

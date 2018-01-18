@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class MissionaryController : MonoBehaviour {
 	public GameObject gameController;
+	public Animator animator;
 	private Material originalMaterial;
 	private Material hoverMaterial;
 	private GameController gameControllerScript;
@@ -22,7 +23,8 @@ public class MissionaryController : MonoBehaviour {
 	}
 
 	void OnMouseOver(){
-		transform.GetComponentInChildren<SkinnedMeshRenderer> ().material = hoverMaterial;
+		if (!gameControllerScript.gameover)
+			transform.GetComponentInChildren<SkinnedMeshRenderer> ().material = hoverMaterial;
 	}
 
 	void OnMouseExit(){
@@ -30,6 +32,7 @@ public class MissionaryController : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
-		gameControllerScript.MouseDownFromMissionary (transform);
+		if (!gameControllerScript.gameover)
+			gameControllerScript.MouseDownFromMissionary (transform);
 	}
 }

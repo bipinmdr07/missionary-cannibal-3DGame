@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
 	// array of size 2 for storing the transform of cannibal and missionary
 	public GameObject canvas;
+	public bool gameover = false;
 	public Transform[] charTransform;
 	private PauseMenuScript pms;
 
@@ -244,11 +245,69 @@ public class GameController : MonoBehaviour {
 
 		if ((missionaries_left_bank != 0) && (cannibals_left_bank > missionaries_left_bank) || ((3 - missionaries_left_bank) != 0) && ((3 - cannibals_left_bank) > (3 - missionaries_left_bank))) {
 			pms.ShowGameOverMenu ();
+
+			if ((missionaries_left_bank != 0) && cannibals_left_bank > missionaries_left_bank) {
+				for (int i = 0; i < 3; i++) {
+					Transform temp = charPosition.GetChild (0).GetChild (i);
+					if (temp.childCount != 0) {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("die", true);
+					}
+				}
+
+				for (int i = 3; i < 6; i++) {
+					Transform temp = charPosition.GetChild (0).GetChild (i);
+					if (temp.childCount != 0) {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("kill", true);
+					}
+				}
+
+				for (int i = 0; i < 2; i++) {
+					Transform temp = charPosition.GetChild (1).GetChild (i);
+					if (charPosition.GetChild (1).GetComponent<BoatController> ().boatPosition == StateScript.boat_pos.right_bank.ToString ()) {
+						break;
+					}
+					if (temp.childCount != 0 && temp.GetChild (0).gameObject.tag == "missionary") {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("die", true);
+					} else if (temp.childCount != 0 && temp.GetChild (0).gameObject.tag == "cannibal") {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("kill", true);
+					}
+				}
+			} else if (((3 - missionaries_left_bank) != 0) && ((3 - cannibals_left_bank) > (3 - missionaries_left_bank))) {
+				for (int i = 0; i < 3; i++) {
+					Transform temp = charPosition.GetChild (2).GetChild (i);
+					if (temp.childCount != 0) {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("die", true);
+					}
+				}
+
+				for (int i = 3; i < 6; i++) {
+					Transform temp = charPosition.GetChild (2).GetChild (i);
+					if (temp.childCount != 0) {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("kill", true);
+					}
+				}
+
+				for (int i = 0; i < 2; i++) {
+					Transform temp = charPosition.GetChild (1).GetChild (i);
+					if (charPosition.GetChild (1).GetComponent<BoatController> ().boatPosition == StateScript.boat_pos.left_bank.ToString ()) {
+						break;
+					}
+					if (temp.childCount != 0 && temp.GetChild (0).gameObject.tag == "missionary") {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("die", true);
+					} else if (temp.childCount != 0 && temp.GetChild (0).gameObject.tag == "cannibal") {
+						temp.GetChild (0).GetComponent<Animator> ().SetBool ("kill", true);
+					}
+				}
+			}
+
+			gameover = true;
+
 			Debug.Log ("GameOver!!!!!!!");
 		}
 
 		if (missionaries_left_bank == 0 && cannibals_left_bank == 0) {
 			pms.ShowCongratulationMenu ();
+			gameover = true;
 			Debug.Log ("*******Congratulation*******");
 		}
 	}

@@ -9,6 +9,7 @@ public class CannibalController : MonoBehaviour {
 	private Material originalMaterial;
 	private Material hoverMaterial;
 	private GameController gameControllerScript;
+	public Animator animator;
 
 	// Use this for initialization
 	void Start () {
@@ -23,7 +24,8 @@ public class CannibalController : MonoBehaviour {
 	}
 
 	void OnMouseOver(){
-		transform.GetComponentInChildren<SkinnedMeshRenderer> ().material = hoverMaterial;
+		if (!gameControllerScript.gameover)
+			transform.GetComponentInChildren<SkinnedMeshRenderer> ().material = hoverMaterial;
 	}
 
 	void OnMouseExit(){
@@ -31,6 +33,7 @@ public class CannibalController : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
-		gameControllerScript.MouseDownFromCannibal (transform);
+		if(!gameControllerScript.gameover)
+			gameControllerScript.MouseDownFromCannibal (transform);
 	}
 }
