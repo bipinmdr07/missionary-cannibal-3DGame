@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 	// array of size 2 for storing the transform of cannibal and missionary
+	public GameObject canvas;
 	public Transform[] charTransform;
+	private PauseMenuScript pms;
 
 	// get the gameobject from the scene that contains all the positions of the characters
 	public Transform charPosition;
@@ -19,6 +21,7 @@ public class GameController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		pms = canvas.GetComponent<PauseMenuScript> ();
 		leftMax = 300f;
 		rightMax = 270f;
 
@@ -240,10 +243,12 @@ public class GameController : MonoBehaviour {
 		}
 
 		if ((missionaries_left_bank != 0) && (cannibals_left_bank > missionaries_left_bank) || ((3 - missionaries_left_bank) != 0) && ((3 - cannibals_left_bank) > (3 - missionaries_left_bank))) {
+			pms.ShowGameOverMenu ();
 			Debug.Log ("GameOver!!!!!!!");
 		}
 
 		if (missionaries_left_bank == 0 && cannibals_left_bank == 0) {
+			pms.ShowCongratulationMenu ();
 			Debug.Log ("*******Congratulation*******");
 		}
 	}

@@ -5,14 +5,15 @@ using UnityEngine.SceneManagement;
 
 public class AutoPlayScript : MonoBehaviour {
 	public GameObject gamecontroller;
+	public GameObject canvas;
 	private GameController gameControllerScript;
 	private bool auto_play_enabled = false;
 	private bool auto_btn_clicked = false;
 	private StateScript sscript;
 
-	public Stack<StateScript> stateStack = new Stack<StateScript>();
-	public Stack<StateScript> buffer = new Stack<StateScript>();
-	public Stack<StateScript> answerStack = new Stack<StateScript> ();
+	private Stack<StateScript> stateStack = new Stack<StateScript>();
+	private Stack<StateScript> buffer = new Stack<StateScript>();
+	private Stack<StateScript> answerStack = new Stack<StateScript> ();
 
 	// Use this for initialization
 	void Start () {
@@ -34,9 +35,8 @@ public class AutoPlayScript : MonoBehaviour {
 				if (leftBank.GetChild (i).childCount == 0) {
 					auto_play_enabled = false;
 					auto_btn_clicked = false;
-					Debug.Log ("Game Restart required");
-					Debug.Log ("Reloading scene");
-					ReloadCurrentScene ();
+					PauseMenuScript ps = canvas.GetComponent<PauseMenuScript> ();
+					ps.ShowAutoPlayMenu ();
 					return;
 				}
 			}
