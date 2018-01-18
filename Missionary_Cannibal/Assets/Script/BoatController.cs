@@ -56,6 +56,10 @@ public class BoatController : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
+		MoveTheBoat ();
+	}
+
+	public void MoveTheBoat(){
 		if (!isMoving)
 			moveBoat = true;
 	}

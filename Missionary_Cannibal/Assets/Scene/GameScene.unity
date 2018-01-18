@@ -463,6 +463,7 @@ MonoBehaviour:
   - {fileID: 998005308}
   - {fileID: 1738999258}
   charPosition: {fileID: 197510848}
+  boatScript: {fileID: 0}
 --- !u!1001 &535423078
 Prefab:
   m_ObjectHideFlags: 0
@@ -505,6 +506,10 @@ Prefab:
     - target: {fileID: 400006, guid: b544816461f324e56a39767fdeb5b114, type: 2}
       propertyPath: m_LocalScale.z
       value: 6.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 400006, guid: b544816461f324e56a39767fdeb5b114, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1.3250066
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b544816461f324e56a39767fdeb5b114, type: 2}

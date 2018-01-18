@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour {
 	private float leftMax, rightMax;
 
 	// grab the script of boat for checking the passangers in boat;
-	private BoatController boatScript;
+	public BoatController boatScript;
 
 	// Use this for initialization
 	void Start () {

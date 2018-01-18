@@ -17,7 +17,6 @@ public class AutoPlayScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		gameControllerScript = gamecontroller.GetComponent<GameController> ();
-//		sscript = gameObject.GetComponent<StateScript> ();
 	}
 	
 	// Update is called once per frame
@@ -28,7 +27,6 @@ public class AutoPlayScript : MonoBehaviour {
 	}
 
 	public void ReadyToGoAuto(){
-		Debug.Log ("Click");
 		if (auto_btn_clicked == false) {
 			auto_btn_clicked = true;
 			Transform leftBank = gameControllerScript.charPosition.GetChild (0);
@@ -42,15 +40,13 @@ public class AutoPlayScript : MonoBehaviour {
 					return;
 				}
 			}
-
-			auto_play_enabled = true;
 			AutoSolve ();
 		}
 	}
 
 	public void ReloadCurrentScene(){
 		int scene = SceneManager.GetActiveScene ().buildIndex;
-		SceneManager.LoadScene (scene);//, LoadSceneMode.Single);
+		SceneManager.LoadScene (scene, LoadSceneMode.Single);
 	}
 
 	// initial state [3.3] [0.0] left_bank
@@ -67,20 +63,16 @@ public class AutoPlayScript : MonoBehaviour {
 
 		HelperFunction (startState, finalState);
 
-		/*Debug.Log ("Buffer: " + CheckForValueInBuffer(startState).ToString());
-
-		buffer.Push (startState);
-
-		Debug.Log ("Buffer: " + CheckForValueInBuffer(startState).ToString());
-*/
 		foreach (StateScript s in stateStack) {
-//			Debug.Log (s.cannibal_count_left.ToString() + ", " + s.missionary_count_left + "," + s.boat_position);
 			answerStack.Push(s);
 		}
 
 		foreach (StateScript ans in answerStack) {
 			Debug.Log (ans.cannibal_count_left.ToString () + ", " + ans.missionary_count_left + "," + ans.boat_position);
 		}
+
+		auto_play_enabled = true;
+		StartCoroutine ("GoToNextState");
 	}
 
 	private bool CheckForValidState(StateScript ss){
@@ -102,7 +94,7 @@ public class AutoPlayScript : MonoBehaviour {
 		StateScript finalState = final;
 		stateStack.Push (currentState);
 
-		Debug.Log (currentState == finalState);
+//		Debug.Log (currentState == finalState);
 
 		StateScript tempState = null;
 
@@ -112,7 +104,6 @@ public class AutoPlayScript : MonoBehaviour {
 			if (currentState.cannibal_count_left == finalState.cannibal_count_left && currentState.missionary_count_left == finalState.missionary_count_left && currentState.cannibal_count_right == finalState.cannibal_count_right && currentState.missionary_count_right == finalState.missionary_count_right && currentState.boat_position == finalState.boat_position) {
 				break;
 			}
-//			Debug.Log ("Current State: " + currentState.cannibal_count_left.ToString() + ", " + currentState.missionary_count_left.ToString() + ", " + currentState.boat_position + "Stack Size: " + stateStack.Count.ToString());
 
 			if (!CheckForValueInBuffer (currentState)) {
 				buffer.Push (currentState);
@@ -128,20 +119,16 @@ public class AutoPlayScript : MonoBehaviour {
 						tempState = new StateScript (currentState.missionary_count_left - missionary, currentState.cannibal_count_left - cannibal, currentState.missionary_count_right + missionary, currentState.cannibal_count_right + cannibal, StateScript.boat_pos.right_bank.ToString());
 						if (CheckForValidState (tempState) && !CheckForValueInBuffer(tempState)) {
 							stateStack.Push (tempState);
-//							Debug.Log ("From Left Bank: " + tempState.cannibal_count_left.ToString() + ", " + tempState.missionary_count_left.ToString() + ", " + tempState.boat_position);
 							found = true;
 							break;
 						}
 					}
 					if (found) {
-//						Debug.Log ("Found on left bank");
 						break;
 					}
-//					Debug.Log ("Loop not broken");
 				}
 
 				if (!found) {
-//					Debug.Log ("Not found on left bank");
 					stateStack.Pop ();
 				}
 			}
@@ -159,25 +146,18 @@ public class AutoPlayScript : MonoBehaviour {
 						if (CheckForValidState (tempState) && !CheckForValueInBuffer(tempState)) {
 							stateStack.Push (tempState);
 							found = true;
-//							Debug.Log ("From right bank: " + tempState.cannibal_count_left.ToString() + ", " + tempState.missionary_count_left.ToString() + ", " + tempState.boat_position);
 							break;
 						}
 					}
 					if (found) {
-//						Debug.Log ("Found on right bank");
 						break;
 					}
 				}
 				if (!found) {
-//					Debug.Log ("Not Found on right bank");
 					StateScript popped = stateStack.Pop ();
-//					Debug.Log ("Popped: " + popped.cannibal_count_left.ToString() + ", " + popped.missionary_count_left.ToString() + ", " + popped.boat_position + " Stack Size: " + stateStack.Count.ToString());
-
 				}
 			}
 		}
-
-		Debug.Log ("Finished");
 	}
 
 	private bool CheckForValueInBuffer(StateScript ss){
@@ -187,5 +167,81 @@ public class AutoPlayScript : MonoBehaviour {
 			}
 		}
 		return false;
+	}
+
+	IEnumerator GoToNextState(){
+		StateScript thisState = null;
+		StateScript thatState = null;
+
+		Transform pos = gameControllerScript.charPosition;
+
+		while (answerStack.Count > 1) {
+			thisState = answerStack.Pop ();
+			thatState = answerStack.Peek ();
+
+			int miss = 0;
+			int cann = 0;
+			if (thisState.boat_position == StateScript.boat_pos.left_bank.ToString ()) {
+				miss = thisState.missionary_count_left - thatState.missionary_count_left;
+				cann = thisState.cannibal_count_left - thatState.cannibal_count_left;
+
+
+				// missionary
+				for (int i = 0; i < 3; i++) {
+					if (pos.GetChild (0).GetChild (i).childCount != 0 && miss != 0) {
+						miss -= 1;
+						gameControllerScript.MouseDownFromMissionary (pos.GetChild (0).GetChild (i).GetChild (0));
+					}
+				}
+
+				// cannibal
+				for (int i = 3; i < 6; i++) {
+					if (pos.GetChild (0).GetChild (i).childCount != 0 && cann != 0) {
+						cann -= 1;
+						gameControllerScript.MouseDownFromCannibal (pos.GetChild (0).GetChild (i).GetChild (0));
+					}
+				}
+			} else {
+				miss = thisState.missionary_count_right - thatState.missionary_count_right;
+				cann = thisState.cannibal_count_right - thatState.cannibal_count_right;
+
+
+				// missionary
+				for (int i = 0; i < 3; i++) {
+					if (pos.GetChild (2).GetChild(i).childCount != 0 && miss != 0) {
+						miss -= 1;
+						gameControllerScript.MouseDownFromMissionary (pos.GetChild (2).GetChild (i).GetChild (0));
+					}
+				}
+
+				// cannibal
+				for (int i = 3; i < 6; i++) {
+					if (pos.GetChild (2).GetChild (i).childCount != 0 && cann != 0) {
+						cann -= 1;
+						gameControllerScript.MouseDownFromCannibal (pos.GetChild (2).GetChild (i).GetChild (0));
+					}
+				}
+			}
+
+			gameControllerScript.boatScript.MoveTheBoat ();
+			yield return new WaitForSeconds (3.5f);
+
+			for (int i = 0; i < 2; i++) {
+				if (pos.GetChild(1).GetChild(i).childCount != 0){
+					if (pos.GetChild (1).GetChild (i).GetChild (0).tag == "cannibal") {
+						gameControllerScript.MouseDownFromCannibal (pos.GetChild (1).GetChild (i).GetChild (0));
+						Debug.Log ("cannibal");
+					}
+
+					else if (pos.GetChild (1).GetChild (i).GetChild (0).tag == "missionary") {
+						gameControllerScript.MouseDownFromMissionary (pos.GetChild (1).GetChild (i).GetChild (0));
+						Debug.Log ("missionary");
+					}
+				}
+			}
+			yield return new WaitForSeconds (0.75f);
+		}
+
+
 	}
 }
